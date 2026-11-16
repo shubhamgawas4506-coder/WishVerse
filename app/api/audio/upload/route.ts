@@ -1,0 +1,80 @@
+import { NextRequest, NextResponse } from "next/server";
+import fs from "fs/promises";
+import path from "path";
+
+// Support both public and data fallback upload directories
+const PUBLIC_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "audio");
+const DATA_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads", "audio");
+
+export async function POST(request: NextRequest) {
+  try {
+    const formData = await request.formData();
+    const file = formData.get("file") as File | null;
+    const clientName = formData.get("name") as string | null;
+    const durationStr = formData.get("duration") as string | null;
+
+    if (!file) {
+      return NextResponse.json({ success: false, error: "No audio file provided." }, { status: 400 });
+    }
+
+    // Validate size (max 50MB for source audio or trimmed clips)
+    const MAX_SIZE = 50 * 1024 * 1024;
+    if (file.size > MAX_SIZE) {
+      return NextResponse.json(
+        { success: false, error: `File size exceeds the 50 MB limit.` },
+        { status: 400 }
+      );
+    }
+
+    // Determine extension & MIME
+    let ext = "wav";
+    const originalName = clientName || file.name || "audio.wav";
+    const dotIdx = originalName.lastIndexOf(".");
+    if (dotIdx !== -1) {
+      const detectedExt = originalName.substring(dotIdx + 1).toLowerCase();
+      if (["wav", "mp3", "m4a", "aac", "ogg", "webm"].includes(detectedExt)) {
+        ext = detectedExt;
+      }
+    }
+
+    const uniqueId = `wv_audio_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const filename = `${uniqueId}.${ext}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    // Ensure directories exist
+    await fs.mkdir(PUBLIC_UPLOAD_DIR, { recursive: true });
+    await fs.mkdir(DATA_UPLOAD_DIR, { recursive: true });
+
+    // Save to both locations for maximum persistence
+    const publicFilePath = path.join(PUBLIC_UPLOAD_DIR, filename);
+    const dataFilePath = path.join(DATA_UPLOAD_DIR, filename);
+
+    await Promise.all([
+      fs.writeFile(publicFilePath, buffer),
+      fs.writeFile(dataFilePath, buffer),
+    ]);
+
+    // Return persistent URL accessible by any browser / client
+    const audioUrl = `/api/audio/${filename}`;
+    const staticUrl = `/uploads/audio/${filename}`;
+
+    return NextResponse.json({
+      success: true,
+      url: audioUrl,
+      staticUrl,
+      filename,
+      size: buffer.length,
+      duration: durationStr ? parseFloat(durationStr) : undefined,
+      name: originalName,
+    });
+  } catch (error) {
+    console.error("Audio upload error:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to process and store audio file on server." },
+      { status: 500 }
+    );
+  }
+}
+

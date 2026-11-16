@@ -1,0 +1,28 @@
+node_modules/
+.next/
+out/
+*.log
+
+# Editor / IDE / AI agent configs
+.kiro/
+.qa/
+CLAUDE.md
+AGENTS.md
+
+# Debug screenshots
+.*-check.png
+wishverse-*.png
+.*wishverse*.png
+
+# Environment
+.env*
+
+# Runtime uploads and user data (created at runtime, not in repo)
+public/uploads/audio/*
+!public/uploads/audio/.gitkeep
+data/uploads/audio/*
+!data/uploads/audio/.gitkeep
+data/messages/*
+!data/messages/.gitkeep
+data/creations/*
+!data/creations/.gitkeep
