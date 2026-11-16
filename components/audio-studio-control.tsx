@@ -30,6 +30,7 @@ import {
   MIN_CLIP_DURATION,
   sliceAudioBuffer,
   audioBufferToBlob,
+  audioBufferToDataUrl,
   uploadTrimmedAudio,
   validateAudioFile,
 } from "@/lib/audio";
@@ -229,13 +230,22 @@ export function AudioStudioControl({
         ? `${baseName.replace(/\.[^/.]+$/, "")}_clip.wav`
         : "wishverse_clip.wav";
 
-      // 3. Upload to server's persistent storage
-      const uploadRes = await uploadTrimmedAudio(wavBlob, sanitizedName, actualDuration);
+      // 3. Upload to server's persistent storage (or fallback to local audio clip if server is read-only)
+      let finalAudioUrl = "";
+      try {
+        const uploadRes = await uploadTrimmedAudio(wavBlob, sanitizedName, actualDuration);
+        if (uploadRes?.url) {
+          finalAudioUrl = uploadRes.url;
+        }
+      } catch (uploadErr) {
+        console.warn("Server storage upload warning, using in-browser audio clip:", uploadErr);
+        finalAudioUrl = audioBufferToDataUrl(sliced);
+      }
 
-      if (uploadRes?.url) {
+      if (finalAudioUrl) {
         const displayName = `${baseName || "Soundtrack"} (${actualDuration.toFixed(1)}s)`;
         applyAudioDetails({
-          audioUrl: uploadRes.url,
+          audioUrl: finalAudioUrl,
           audioName: displayName,
           audioDuration: `${actualDuration.toFixed(1)}s`,
           audioTrimStart: startSec.toFixed(2),

@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
 import os from "os";
+import { put } from "@vercel/blob";
 
-// Support both public, data, and serverless tmp upload directories
+// Support Vercel Blob (primary for production), plus public, data, and serverless tmp upload directories
 const PUBLIC_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "audio");
 const DATA_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads", "audio");
 const TMP_UPLOAD_DIR = path.join(os.tmpdir(), "wishverse_audio");
@@ -42,10 +43,31 @@ export async function POST(request: NextRequest) {
     const uniqueId = `wv_audio_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
     const filename = `${uniqueId}.${ext}`;
 
+    // 1. If Vercel Blob token is configured (Official Vercel Cloud Storage)
+    if (process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const blob = await put(`wishverse-audio/${filename}`, file, {
+          access: "public",
+        });
+
+        return NextResponse.json({
+          success: true,
+          url: blob.url,
+          staticUrl: blob.url,
+          filename,
+          size: file.size,
+          duration: durationStr ? parseFloat(durationStr) : undefined,
+          name: originalName,
+        });
+      } catch (blobErr) {
+        console.warn("Vercel Blob upload warning, attempting disk fallback:", blobErr);
+      }
+    }
+
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Save audio file — try local persistent folders, fall back to os.tmpdir() on serverless (Vercel)
+    // 2. Local disk fallback (for local development or persistent Node server)
     let saved = false;
     try {
       await fs.mkdir(PUBLIC_UPLOAD_DIR, { recursive: true });
@@ -68,14 +90,28 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Return persistent URL accessible by any browser / client
-    const audioUrl = `/api/audio/${filename}`;
-    const staticUrl = `/uploads/audio/${filename}`;
+    // If written to disk or /tmp
+    if (saved) {
+      const audioUrl = `/api/audio/${filename}`;
+      const staticUrl = `/uploads/audio/${filename}`;
 
+      return NextResponse.json({
+        success: true,
+        url: audioUrl,
+        staticUrl,
+        filename,
+        size: buffer.length,
+        duration: durationStr ? parseFloat(durationStr) : undefined,
+        name: originalName,
+      });
+    }
+
+    // 3. Ultra-safe fallback for read-only serverless if no blob token is provided
+    const base64Data = `data:audio/${ext};base64,${buffer.toString("base64")}`;
     return NextResponse.json({
       success: true,
-      url: audioUrl,
-      staticUrl,
+      url: base64Data,
+      staticUrl: base64Data,
       filename,
       size: buffer.length,
       duration: durationStr ? parseFloat(durationStr) : undefined,
