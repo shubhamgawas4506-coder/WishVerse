@@ -2,10 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import { createReadStream, existsSync, statSync } from "fs";
 import path from "path";
+import os from "os";
 import { Readable } from "stream";
 
 const PUBLIC_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "audio");
 const DATA_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads", "audio");
+const TMP_UPLOAD_DIR = path.join(os.tmpdir(), "wishverse_audio");
 
 const MIME_MAP: Record<string, string> = {
   wav: "audio/wav",
@@ -33,7 +35,10 @@ export async function GET(
     if (!existsSync(filePath)) {
       filePath = path.join(DATA_UPLOAD_DIR, filename);
       if (!existsSync(filePath)) {
-        return new NextResponse("Audio file not found.", { status: 404 });
+        filePath = path.join(TMP_UPLOAD_DIR, filename);
+        if (!existsSync(filePath)) {
+          return new NextResponse("Audio file not found.", { status: 404 });
+        }
       }
     }
 

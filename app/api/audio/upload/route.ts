@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import os from "os";
 
-// Support both public and data fallback upload directories
+// Support both public, data, and serverless tmp upload directories
 const PUBLIC_UPLOAD_DIR = path.join(process.cwd(), "public", "uploads", "audio");
 const DATA_UPLOAD_DIR = path.join(process.cwd(), "data", "uploads", "audio");
+const TMP_UPLOAD_DIR = path.join(os.tmpdir(), "wishverse_audio");
 
 export async function POST(request: NextRequest) {
   try {
@@ -43,18 +45,28 @@ export async function POST(request: NextRequest) {
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Ensure directories exist
-    await fs.mkdir(PUBLIC_UPLOAD_DIR, { recursive: true });
-    await fs.mkdir(DATA_UPLOAD_DIR, { recursive: true });
-
-    // Save to both locations for maximum persistence
-    const publicFilePath = path.join(PUBLIC_UPLOAD_DIR, filename);
-    const dataFilePath = path.join(DATA_UPLOAD_DIR, filename);
-
-    await Promise.all([
-      fs.writeFile(publicFilePath, buffer),
-      fs.writeFile(dataFilePath, buffer),
-    ]);
+    // Save audio file — try local persistent folders, fall back to os.tmpdir() on serverless (Vercel)
+    let saved = false;
+    try {
+      await fs.mkdir(PUBLIC_UPLOAD_DIR, { recursive: true });
+      await fs.mkdir(DATA_UPLOAD_DIR, { recursive: true });
+      const publicFilePath = path.join(PUBLIC_UPLOAD_DIR, filename);
+      const dataFilePath = path.join(DATA_UPLOAD_DIR, filename);
+      await Promise.all([
+        fs.writeFile(publicFilePath, buffer),
+        fs.writeFile(dataFilePath, buffer),
+      ]);
+      saved = true;
+    } catch {
+      try {
+        await fs.mkdir(TMP_UPLOAD_DIR, { recursive: true });
+        const tmpFilePath = path.join(TMP_UPLOAD_DIR, filename);
+        await fs.writeFile(tmpFilePath, buffer);
+        saved = true;
+      } catch (tmpErr) {
+        console.warn("Serverless tmp audio write warning:", tmpErr);
+      }
+    }
 
     // Return persistent URL accessible by any browser / client
     const audioUrl = `/api/audio/${filename}`;

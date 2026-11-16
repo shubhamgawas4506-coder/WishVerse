@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import fs from "fs/promises";
 import path from "path";
+import os from "os";
 
 const MESSAGES_DIR = path.join(process.cwd(), "data", "messages");
+const TMP_MESSAGES_DIR = path.join(os.tmpdir(), "wishverse_messages");
 
 export async function POST(request: NextRequest) {
   try {
@@ -36,24 +38,31 @@ export async function POST(request: NextRequest) {
       createdAt: timestamp,
     };
 
-    // Ensure storage directory exists
-    await fs.mkdir(MESSAGES_DIR, { recursive: true });
-
-    // Save message persistently to disk
-    const filePath = path.join(MESSAGES_DIR, `${record.id}.json`);
-    await fs.writeFile(filePath, JSON.stringify(record, null, 2), "utf-8");
-
-    // Also update index list
-    const indexFile = path.join(MESSAGES_DIR, "index.json");
-    let existingList: typeof record[] = [];
+    // Try saving message persistently to disk; on serverless (Vercel), fall back to os.tmpdir()
     try {
-      const raw = await fs.readFile(indexFile, "utf-8");
-      existingList = JSON.parse(raw);
+      await fs.mkdir(MESSAGES_DIR, { recursive: true });
+      const filePath = path.join(MESSAGES_DIR, `${record.id}.json`);
+      await fs.writeFile(filePath, JSON.stringify(record, null, 2), "utf-8");
+
+      const indexFile = path.join(MESSAGES_DIR, "index.json");
+      let existingList: typeof record[] = [];
+      try {
+        const raw = await fs.readFile(indexFile, "utf-8");
+        existingList = JSON.parse(raw);
+      } catch {
+        existingList = [];
+      }
+      const updated = [record, ...existingList].slice(0, 500);
+      await fs.writeFile(indexFile, JSON.stringify(updated, null, 2), "utf-8");
     } catch {
-      existingList = [];
+      try {
+        await fs.mkdir(TMP_MESSAGES_DIR, { recursive: true });
+        const tmpFilePath = path.join(TMP_MESSAGES_DIR, `${record.id}.json`);
+        await fs.writeFile(tmpFilePath, JSON.stringify(record, null, 2), "utf-8");
+      } catch (tmpErr) {
+        console.warn("Serverless tmp message write warning:", tmpErr);
+      }
     }
-    const updated = [record, ...existingList].slice(0, 500);
-    await fs.writeFile(indexFile, JSON.stringify(updated, null, 2), "utf-8");
 
     console.log(`[Contact Form] Message recorded for ${targetEmail} from ${trimmedName} (${trimmedEmail})`);
 
