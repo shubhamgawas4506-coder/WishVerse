@@ -2085,41 +2085,128 @@
   }
 }
 
-/* Mobile Responsiveness */
+/* Mobile & Tablet Responsiveness */
+@media (min-width: 651px) and (max-width: 1024px) {
+  .recv-bouquet { grid-template-columns: 320px 1fr; width: 94vw; }
+  .recv-newspaper > div { columns: 2; }
+  .recv-book { grid-template-columns: 200px 1fr; width: 94vw; }
+  .recv-playlist { grid-template-columns: 320px 1fr; width: 94vw; }
+  .recv-open-when { grid-template-columns: 260px 1fr; width: 94vw; }
+  .recv-coffee-table { gap: 24px; }
+}
+
 @media (max-width: 650px) {
   .receiver-world::after { display: none; }
-  .receiver-header { left: 14px; right: 14px; top: 14px; }
+  .receiver-header { left: 12px; right: 12px; top: 12px; }
   .receiver-header > button span { display: none; }
-  .receiver-frame { padding: 68px 14px 60px; overflow-y: auto; }
-  .arrival-copy h1 { font-size: 44px; }
-  .arrival-copy p { font-size: 18px; }
-  .receiver-stage-kicker { top: 70px; }
-  .receiver-next { margin-top: 10px; }
-  .receiver-now-playing { left: 12px; bottom: 14px; min-width: 155px; }
-  .receiver-progress { bottom: 20px; left: auto; right: 14px; transform: none; }
-  .receiver-progress span { width: 20px; }
-  .typewriter-paper { min-height: 360px; padding: 34px 26px 54px; }
-  .typewriter-paper h2 { font-size: 30px; }
+  .receiver-frame { padding: 64px 12px 50px; overflow-y: auto; overflow-x: hidden; }
+  .arrival-copy h1 { font-size: 38px; line-height: 1; }
+  .arrival-copy p { font-size: 16px; }
+  .receiver-stage-kicker { top: 62px; font-size: 9px; }
+  .receiver-next { margin-top: 14px; font-size: 12px; padding: 10px 18px; }
+  .receiver-now-playing { left: 10px; bottom: 12px; min-width: 140px; padding: 6px 10px; }
+  .receiver-progress { bottom: 16px; left: auto; right: 10px; transform: none; }
+  .receiver-progress span { width: 18px; }
+
+  /* Photobooth */
+  .recv-photobooth { width: min(100%, 94vw); padding: 14px 12px 20px; border-width: 5px; border-radius: 16px; }
+  .recv-booth-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .recv-booth-grid figure { padding: 6px 6px 12px; }
+  .recv-booth-grid figure > img, .recv-booth-grid figure > svg { height: 130px; }
+  .recv-booth-grid figure > svg { padding: 30px; }
+  .recv-photobooth > footer { font-size: 15px; margin-top: 12px; }
+
+  /* Bouquet */
+  .recv-bouquet { grid-template-columns: 1fr; width: min(100%, 94vw); gap: 16px; justify-items: center; }
+  .recv-bouquet > div { height: 320px; transform: scale(0.85); transform-origin: center bottom; width: 100%; max-width: 310px; }
+  .recv-bouquet > section { width: 100%; max-width: 310px; margin: 0 auto; padding: 22px 18px; }
+  .recv-bouquet > section h2 { font-size: 30px; }
+
+  /* Digital Newspaper */
+  .recv-newspaper { width: min(100%, 94vw); padding: 18px 14px; min-height: auto; transform: none; }
+  .recv-newspaper header h2 { font-size: 28px; }
+  .recv-newspaper > h1 { font-size: 20px; line-height: 1.15; margin: 10px 0; }
+  .recv-newspaper > div { columns: 1; column-gap: 0; }
+  .recv-newspaper figure img, .recv-newspaper figure svg { height: 130px; }
+  .recv-newspaper > div p { font-size: 13px; line-height: 1.55; }
+
+  /* Memory Book */
+  .recv-book { grid-template-columns: 1fr; width: min(100%, 94vw); perspective: none; }
+  .recv-book > aside { display: none; }
+  .recv-book > section { min-height: auto; padding: 28px 18px; border-radius: 8px; border-width: 1.5px; }
+  .recv-book > section h2 { font-size: 25px; }
+
+  /* Letter Reveal & Open When */
+  .recv-letter-reveal { width: min(100%, 94vw); min-height: 360px; }
+  .recv-envelope { width: min(100%, 92vw); height: 220px; padding: 14px; }
+  .recv-envelope span { font-size: 19px; }
+  .recv-letter-paper { width: min(100%, 94vw); min-height: auto; padding: 26px 16px 32px; transform: translateY(20px) scale(0.95); }
+  .recv-letter-paper h2 { font-size: 24px; margin: 8px 0 12px; }
+  .recv-letter-paper p { font-size: 14px; line-height: 1.6; min-height: 70px; }
+  .recv-open-when { grid-template-columns: 1fr; width: min(100%, 94vw); gap: 18px; }
+
+  /* Coffee Table */
+  .recv-coffee { width: min(100%, 94vw); }
+  .recv-cafe-awning { width: min(280px, 90vw); font-size: 22px; padding: 10px 16px 6px; }
+  .recv-coffee-table { flex-direction: column; height: auto; min-height: 360px; border-radius: 28px; padding: 24px 14px; gap: 16px; box-shadow: 0 10px 0 #664637, 4px 14px 0 rgba(96, 72, 63, 0.14); }
+  .recv-cup { width: 115px; height: 115px; border-width: 10px; }
+  .recv-cup > svg { width: 40px; height: 40px; }
+  .recv-coffee-table article { width: 100%; max-width: 280px; min-height: auto; padding: 18px 16px; }
+
+  /* Playlist & Vinyl */
+  .recv-playlist { grid-template-columns: 1fr; width: min(100%, 94vw); gap: 16px; }
+  .recv-player { height: auto; padding: 20px 16px; border-width: 6px; }
+  .recv-vinyl { width: 180px; height: 180px; margin: 0 auto; }
+
+  /* Video */
+  .recv-video { grid-template-columns: 1fr; width: min(100%, 94vw); border-width: 5px; }
+  .recv-video-screen { height: 230px; }
+
+  /* Chocolate & Cake */
+  .recv-chocolate { width: min(100%, 94vw); padding: 18px 14px; border-width: 6px; border-radius: 16px; }
+  .recv-cake { width: min(260px, 85vw); height: 150px; }
+
+  /* Jar & Coupons */
+  .recv-jar { flex-direction: column; width: min(100%, 94vw); min-height: auto; gap: 18px; }
+  .recv-coupons { width: min(100%, 94vw); min-height: auto; }
+
+  /* Promise / Save the Date */
+  .recv-promise { grid-template-columns: 1fr; width: min(100%, 94vw); min-height: auto; }
+  .recv-promise aside { padding: 14px; flex-direction: row; justify-content: center; gap: 10px; }
+
+  /* Timeline & Custom */
+  .recv-timeline { width: min(100%, 94vw); padding: 18px 14px; }
+  .recv-custom { width: min(100%, 94vw); padding: 22px 16px; }
+
+  /* Surprise Box (Unbox) */
+  .recv-unbox { width: min(100%, 94vw); min-height: auto; flex-direction: column; align-items: center; gap: 18px; }
+  .recv-unbox > article { width: min(280px, 90vw); min-height: auto; padding: 22px 18px; }
+
+  /* Typewriter & Postcards */
+  .typewriter-paper { min-height: 320px; padding: 28px 18px 44px; width: min(100%, 94vw); }
+  .typewriter-paper h2 { font-size: 26px; }
   .typewriter-paper p { font-size: 13px; }
-  .typewriter-machine { margin: -22px -12px 0; padding: 22px 18px; }
-  .exp-letter { padding: 48px 30px 36px; }
-  .exp-letter h2 { font-size: 30px; }
-  .exp-letter p { font-size: 18px; }
-  .exp-postcard { grid-template-columns: 1fr; min-height: 500px; }
-  .exp-postcard-scene { min-height: 210px; }
-  .exp-postcard > div:last-child { padding: 36px 26px; }
+  .typewriter-machine { margin: -18px -10px 0; padding: 18px 14px; }
+  .exp-letter { padding: 36px 20px 28px; width: min(100%, 94vw); }
+  .exp-letter h2 { font-size: 26px; }
+  .exp-letter p { font-size: 16px; }
+  .exp-postcard { grid-template-columns: 1fr; min-height: 440px; width: min(100%, 94vw); }
+  .exp-postcard-scene { min-height: 180px; }
+  .exp-postcard > div:last-child { padding: 26px 18px; }
   .exp-postcard > div:last-child::before { display: none; }
-  .exp-memory-note { padding: 50px 30px; }
-  .exp-memory-note h2 { font-size: 30px; }
-  .memory-orbit { height: 450px; }
-  .orbit-line { width: 410px; height: 210px; }
-  .memory-polaroid { width: 275px; min-height: 340px; }
-  .memory-polaroid > div { height: 195px; }
-  .receiver-frame > h1 { font-size: 46px; }
-  .receiver-final-actions { flex-wrap: wrap; }
-  .receiver-moon { width: 75px; height: 75px; right: 7%; top: 9%; }
-  .receiver-moon::after { width: 76px; height: 76px; }
-  .final-heart { margin-bottom: 14px; }
+  .exp-memory-note { padding: 36px 20px; width: min(100%, 94vw); }
+  .exp-memory-note h2 { font-size: 26px; }
+
+  /* Orbit line for Memory Reveal */
+  .memory-orbit { height: 420px; }
+  .orbit-line { width: min(320px, 86vw); height: 160px; }
+  .memory-polaroid { width: min(280px, 86vw); min-height: 320px; }
+  .memory-polaroid > div { height: 180px; }
+  .receiver-frame > h1 { font-size: 38px; line-height: 1; }
+  .receiver-final-actions { flex-wrap: wrap; gap: 10px; }
+  .receiver-moon { width: 60px; height: 60px; right: 5%; top: 6%; }
+  .receiver-moon::after { width: 62px; height: 62px; }
+  .final-heart { margin-bottom: 12px; }
 }
 
 /* Explicit Custom Property Helpers */

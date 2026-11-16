@@ -1,10 +1,18 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Caveat, DM_Sans, Fredoka, Instrument_Serif, Special_Elite } from "next/font/google";
 import "./globals.css";
 import "./studio.css";
 import "./experience.css";
 import "./maker.css";
 import "./platform.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: "#fff8f0",
+};
 
 const sans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 const rounded = Fredoka({ subsets: ["latin"], variable: "--font-round" });

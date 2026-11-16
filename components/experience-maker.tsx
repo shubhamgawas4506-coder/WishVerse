@@ -26,6 +26,8 @@ import {
   MapPin,
   Music2,
   Newspaper,
+  Pause,
+  Pencil,
   Play,
   Plus,
   Puzzle,
@@ -40,7 +42,6 @@ import {
   Type,
   Upload,
   Video,
-  Pause,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -112,6 +113,7 @@ export function ExperienceMaker({ experience }: { experience: ExperienceKind }) 
     media: [],
   });
   const [tab, setTab] = useState<"content" | "magic">("content");
+  const [mobileMode, setMobileMode] = useState<"edit" | "preview">("edit");
   const [publishOpen, setPublishOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [saved, setSaved] = useState(true);
@@ -195,7 +197,24 @@ export function ExperienceMaker({ experience }: { experience: ExperienceKind }) 
       <div><a href={previewUrl || "#"} target="_blank" rel="noreferrer"><Eye /> Receiver preview</a><button onClick={() => { saveCreation({ id: creationId, publicId, rCode, greeting, name: greeting.title, status: "published" }); setPublishOpen(true); }}><Send /> Finish & share</button></div>
     </header>
 
-    <div className="maker-layout">
+    <div className="maker-mobile-toggle-bar">
+      <button
+        type="button"
+        className={mobileMode === "edit" ? "active" : ""}
+        onClick={() => setMobileMode("edit")}
+      >
+        <Pencil /> 01 · Edit Story
+      </button>
+      <button
+        type="button"
+        className={mobileMode === "preview" ? "active" : ""}
+        onClick={() => setMobileMode("preview")}
+      >
+        <Eye /> 02 · Live Preview
+      </button>
+    </div>
+
+    <div className={`maker-layout mobile-view-${mobileMode}`}>
       <aside className="maker-sidebar">
         <div className="maker-intro"><span><ExperienceIcon experience={experience} /></span><small>MAKE A</small><h1>{meta.name}</h1><p>{meta.description}</p></div>
         <div className="maker-tabs"><button className={tab === "content" ? "active" : ""} onClick={() => setTab("content")}>01 · Story</button><button className={tab === "magic" ? "active" : ""} onClick={() => setTab("magic")}>02 · Details</button></div>
