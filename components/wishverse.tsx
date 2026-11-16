@@ -599,6 +599,9 @@ export function WishVerse() {
           <a href="#about-me" className="footer-created-by">
             Created by Shubham Gawas with love ♡
           </a>
+          <span className="footer-version-badge" title="Latest build verified">
+            v2.2 · Mobile &amp; Audio Live ✦
+          </span>
           <a href="#top" className="footer-back-to-top">
             Top ↑
           </a>

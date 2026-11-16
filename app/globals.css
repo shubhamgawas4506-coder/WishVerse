@@ -860,6 +860,21 @@
   text-decoration: underline;
 }
 
+.footer-version-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(226, 143, 168, 0.18);
+  border: 1px solid rgba(226, 143, 168, 0.35);
+  color: #eed0d8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
 .footer-back-to-top {
   color: #d2bbb3;
   transition: color 0.2s;
